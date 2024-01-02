@@ -1,0 +1,32 @@
+version: "3.6"
+services:
+    php:
+        build: .
+        restart: always
+        ports:
+            - "8080:80"
+        volumes:
+            - ./src:/var/www/html
+            - ./log:/var/log/apache2
+    mysql:
+        image: mysql:8.0
+        restart: always
+        ports:
+            - "3306:3306"
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            - MYSQL_DATABASE=hms
+            - MYSQL_ROOT_PASSWORD=test
+        volumes:
+            - ./dump:/docker-entrypoint-initdb.d
+            - ./conf:/etc/mysql/conf.d
+            - persistent:/var/lib/mysql
+    phpmyadmin:
+        image: phpmyadmin
+        restart: always
+        ports:
+            - 8081:80
+        environment:
+            - PMA_HOST=mysql
+volumes:
+    persistent:
